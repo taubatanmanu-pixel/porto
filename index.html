@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id" x-data="{ light: localStorage.getItem('theme') === 'light' }" :class="light ? 'light' : ''">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MANU — Portfolio</title>
+<meta name="description" content="Portfolio web developer spesialis web bisnis, admin panel, dan sistem akuntansi.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>M</text></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        cosmos: { 950:'#050014', 900:'#0a0421', 800:'#12082e', 700:'#1a0b3d' },
+        nebula: { cyan:'#22d3ee', violet:'#a855f7', magenta:'#ec4899', blue:'#3b82f6' },
+        star: '#e2e8f0'
+      },
+      fontFamily: {
+        serif: ['Georgia','Times New Roman','serif'],
+        sans: ['Segoe UI','system-ui','sans-serif'],
+        mono: ['Consolas','Monaco','monospace']
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'twinkle': 'twinkle 3s ease-in-out infinite',
+        'drift': 'drift 20s linear infinite',
+        'pulse-glow': 'pulseGlow 3s ease-in-out infinite'
+      },
+      keyframes: {
+        float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-12px)' } },
+        twinkle: { '0%,100%': { opacity: '.2' }, '50%': { opacity: '1' } },
+        drift: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-100px)' } },
+        pulseGlow: { '0%,100%': { opacity: '.5' }, '50%': { opacity: '1' } }
+      }
+    }
+  }
+}
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<style>
+html, body { overflow-x: hidden; } html { overflow-x: clip; }
+html { scroll-behavior: smooth; }
+
+/* ===== GALAXY BACKGROUND ===== */
+body {
+  background: radial-gradient(ellipse at 20% 0%, #1a0b3d 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 100%, #0f1729 0%, transparent 50%),
+              linear-gradient(180deg, #050014 0%, #0a0421 50%, #050014 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Starfield */
+#stars, #stars2, #stars3 {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+#stars::after, #stars2::after, #stars3::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 40px 70px, #cbd5e1, transparent),
+    radial-gradient(2px 2px at 90px 40px, #a5b4fc, transparent),
+    radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 160px 120px, #e9d5ff, transparent),
+    radial-gradient(1px 1px at 200px 50px, #fff, transparent),
+    radial-gradient(1px 1px at 250px 100px, #93c5fd, transparent),
+    radial-gradient(2px 2px at 300px 20px, #fff, transparent);
+  background-size: 350px 200px;
+  background-repeat: repeat;
+}
+#stars::after { animation: twinkle 4s ease-in-out infinite; }
+#stars2::after { background-size: 550px 350px; animation: twinkle 6s ease-in-out infinite .5s; opacity: .6; }
+#stars3::after { background-size: 800px 500px; animation: twinkle 8s ease-in-out infinite 1s; opacity: .4; }
+
+/* Nebula glows */
+.nebula-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: .35;
+}
+.nebula-1 { width: 400px; height: 400px; background: #a855f7; top: -120px; left: -80px; animation: float 12s ease-in-out infinite; }
+.nebula-2 { width: 250px; height: 250px; background: #22d3ee; bottom: -50px; right: -50px; animation: float 15s ease-in-out infinite 2s; }
+.nebula-3 { width: 280px; height: 280px; background: #ec4899; top: 40%; right: 2%; animation: float 18s ease-in-out infinite 4s; opacity: .15; }
+
+/* ===== COMPONENTS ===== */
+.glass {
+  background: rgba(18, 8, 46, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(168, 85, 247, 0.18);
+}
+.glass:hover {
+  border-color: rgba(34, 211, 238, 0.45);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.25), 0 0 60px rgba(34, 211, 238, 0.1);
+}
+.gradient-text {
+  background: linear-gradient(135deg, #22d3ee 0%, #a855f7 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.glow-text { text-shadow: 0 0 20px rgba(168,85,247,.6), 0 0 40px rgba(34,211,238,.3); }
+
+.reveal { opacity:0; transform:translateY(30px); transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1); }
+.reveal.visible { opacity:1; transform:none; }
+
+@keyframes breathe { 0%,100%{opacity:.4} 50%{opacity:1} }
+.breathe { animation: breathe 2.5s ease-in-out infinite; }
+@keyframes blink { 50% { border-color: transparent } }
+.typewriter-cursor { border-right: 2px solid #22d3ee; padding-right: 2px; animation: blink .8s step-end infinite; }
+@keyframes pulse { 0%,100%{opacity:1; box-shadow:0 0 0 0 rgba(34,211,238,.7)} 50%{opacity:.7; box-shadow:0 0 0 6px rgba(34,211,238,0)} }
+.pulse { animation: pulse 2s infinite; }
+
+/* Orbital ring decoration */
+.orbit-ring {
+  position: absolute;
+  border: 1px solid rgba(168,85,247,.15);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Nav blur */
+nav { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+
+/* Light mode override */
+html.light body {
+  background: linear-gradient(180deg, #e8eaf6 0%, #f3e5f5 50%, #e8eaf6 100%);
+}
+html.light .glass {
+  background: rgba(255,255,255,.7);
+  border-color: rgba(168,85,247,.3);
+}
+html.light #stars::after, html.light #stars2::after, html.light #stars3::after { opacity: .08; }
+html.light .text-slate-300, html.light .text-slate-400 { color: #4a4a6a !important; }
+
+/* Light mode: additional overrides */
+html.light .gradient-text { background: linear-gradient(135deg, #7c3aed 0%, #0891b2 50%, #db2777 100%); -webkit-background-clip: text; background-clip: text; }
+html.light .text-white { color: #1e1b4b !important; }
+html.light .section-title, html.light h3, html.light h4 { color: #1e1b4b !important; }
+html.light .hero-desc, html.light .about-text p, html.light blockquote { color: #374151 !important; }
+html.light .font-mono { color: #4a044e !important; }
+</style>
+</head>
+<body class="bg-cosmos-950 text-star font-sans antialiased overflow-x-hidden">
+
+<!-- STARFIELD LAYERS -->
+<div id="stars"></div>
+<div id="stars2"></div>
+<div id="stars3"></div>
+
+<!-- NEBULA GLOWS -->
+<div class="nebula-glow nebula-1"></div>
+<div class="nebula-glow nebula-2"></div>
+<div class="nebula-glow nebula-3"></div>
+
+<!-- SPLASH -->
+<div id="splash" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-cosmos-950 transition-opacity duration-700">
+  <div class="relative">
+    <div class="orbit-ring" style="width:200px;height:200px;top:-40px;left:-40px;"></div>
+    <h1 class="font-serif text-[clamp(3rem,10vw,7rem)] tracking-[.3em] breathe gradient-text relative z-10">MANU</h1>
+  </div>
+  <p class="text-slate-400 mt-4 text-sm tracking-[.25em] uppercase">Web Developer · Problem Solver</p>
+  <div class="mt-6 flex gap-1.5">
+    <span class="w-1.5 h-1.5 rounded-full bg-nebula-cyan animate-pulse-glow"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-nebula-violet animate-pulse-glow" style="animation-delay:.3s"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-nebula-magenta animate-pulse-glow" style="animation-delay:.6s"></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="fixed top-0 left-0 right-0 z-40 px-6 py-4 flex items-center justify-between glass border-b border-white/5" x-data="{ open: false }">
+  <a href="#" class="font-serif text-xl tracking-[.2em] gradient-text font-bold">M.</a>
+  <ul class="hidden md:flex gap-8 items-center">
+    <li><a href="#about" class="text-slate-300 text-xs tracking-[.1em] uppercase hover:text-nebula-cyan transition-colors duration-300 py-2.5 min-h-[44px] inline-flex items-center">Tentang</a></li>
+    <li><a href="#skills" class="text-slate-300 text-xs tracking-[.1em] uppercase hover:text-nebula-cyan transition-colors duration-300 py-2.5 min-h-[44px] inline-flex items-center">Keahlian</a></li>
+    <li><a href="#proses" class="text-slate-300 text-xs tracking-[.1em] uppercase hover:text-nebula-cyan transition-colors duration-300 py-2.5 min-h-[44px] inline-flex items-center">Proses</a></li>
+    <li><a href="#projects" class="text-slate-300 text-xs tracking-[.1em] uppercase hover:text-nebula-cyan transition-colors duration-300 py-2.5 min-h-[44px] inline-flex items-center">Proyek</a></li>
+    <li><a href="#testi" class="text-slate-300 text-xs tracking-[.1em] uppercase hover:text-nebula-cyan transition-colors duration-300 py-2.5 min-h-[44px] inline-flex items-center">Testimoni</a></li>
+    <li>
+      <button @click="light = !light; document.documentElement.classList.toggle('light'); localStorage.setItem('theme', light?'light':'dark')"
+              class="w-10 h-10 rounded-full glass flex items-center justify-center hover:border-nebula-cyan transition-all duration-300 text-slate-200"
+              :aria-label="light ? 'Dark mode' : 'Light mode'">
+        <svg x-show="!light" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg x-show="light" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/></svg>
+      </button>
+    </li>
+  </ul>
+  <button @click="open = !open" class="md:hidden w-10 h-10 rounded-lg glass flex items-center justify-center text-slate-200">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+  </button>
+  <div x-show="open" x-transition class="absolute top-full left-0 right-0 glass border-b border-white/5 md:hidden">
+    <ul class="flex flex-col">
+      <li><a href="#about" @click="open=false" class="block px-6 py-3 text-sm text-slate-300 border-b border-white/5 hover:text-nebula-cyan">Tentang</a></li>
+      <li><a href="#skills" @click="open=false" class="block px-6 py-3 text-sm text-slate-300 border-b border-white/5 hover:text-nebula-cyan">Keahlian</a></li>
+      <li><a href="#proses" @click="open=false" class="block px-6 py-3 text-sm text-slate-300 border-b border-white/5 hover:text-nebula-cyan">Proses</a></li>
+      <li><a href="#projects" @click="open=false" class="block px-6 py-3 text-sm text-slate-300 border-b border-white/5 hover:text-nebula-cyan">Proyek</a></li>
+      <li><a href="#testi" @click="open=false" class="block px-6 py-3 text-sm text-slate-300 hover:text-nebula-cyan">Testimoni</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="relative z-10 min-h-screen grid md:grid-cols-2 items-center px-8 pt-28 pb-16 gap-14 max-w-7xl mx-auto">
+  <div class="reveal">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs text-nebula-cyan tracking-wider mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-nebula-cyan pulse"></span>
+      Available for work
+    </div>
+    <h2 class="font-serif text-[clamp(2rem,4.5vw,3.8rem)] leading-[1.1] mb-5 text-white">
+      Web yang saya buat<br><span class="text-slate-400">bukan template</span><br><span class="gradient-text">AI-generated.</span>
+    </h2>
+    <p class="text-slate-400 text-base mb-5 max-w-md leading-relaxed">Saya membangun website ringan, cepat, dan sesuai konteks &mdash; bukan template generik yang terlihat sama dengan ribuan web lain.</p>
+    <p class="text-slate-400 text-sm mb-9">Sekarang fokus ke:<br>
+      <span class="typewriter-cursor text-nebula-cyan font-mono text-base" id="typewriter"></span>
+    </p>
+    <div class="flex gap-3 flex-wrap">
+      <a href="#projects" class="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-gradient-to-r from-nebula-violet to-nebula-cyan text-white text-sm font-semibold tracking-wide hover:shadow-[0_0_30px_rgba(168,85,247,.5)] transition-all duration-300">
+        Lihat karya
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#contact" class="inline-flex items-center gap-2 px-7 py-3 rounded-full glass text-slate-200 text-sm font-semibold tracking-wide hover:border-nebula-cyan transition-all duration-300">
+        Hubungi saya
+      </a>
+    </div>
+  </div>
+
+  <div class="reveal relative flex justify-center">
+    <div class="absolute w-80 h-80 rounded-full bg-gradient-to-tr from-nebula-violet/25 to-nebula-cyan/25 blur-3xl animate-float"></div>
+    <div class="absolute w-[110%] h-[110%] rounded-full border border-nebula-violet/15"></div>
+    <div class="absolute w-[125%] h-[125%] rounded-full border border-nebula-cyan/10"></div>
+    <div class="relative w-full max-w-sm pb-8">
+      <div class="aspect-[3/4] rounded-3xl overflow-hidden glass shadow-[0_0_60px_rgba(168,85,247,.3)]">
+        <img src="manu.jpg" alt="Foto MANU" class="w-full h-full object-cover" loading="eager">
+      </div>
+      <div class="absolute bottom-[18%] right-[-8px] px-4 py-2.5 rounded-2xl glass text-xs text-slate-200 font-mono shadow-lg z-20">
+        &lt;full-stack /&gt;
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="relative z-10 px-8 py-24 max-w-7xl mx-auto">
+  <div class="mb-14">
+    <p class="text-nebula-cyan text-xs tracking-[.3em] uppercase mb-3 font-mono">01 / Tentang</p>
+    <h3 class="reveal font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] mb-3 text-white">Bukan sekadar coding</h3>
+    <p class="reveal text-slate-400 text-sm">Memahami konteks bisnis sebelum menulis satu baris kode</p>
+  </div>
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="reveal glass rounded-2xl p-7 transition-all duration-500 group h-full">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-nebula-violet/20 to-nebula-cyan/20 flex items-center justify-center text-nebula-cyan mb-5 group-hover:scale-110 transition-transform duration-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <h4 class="font-semibold mb-2.5 text-white">Cepat &amp; Ringan</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Tanpa framework berat. Vanilla JS, tanpa library tak perlu. Web tetap berjalan mulus di HP kentang sekalipun.</p>
+    </div>
+    <div class="reveal glass rounded-2xl p-7 transition-all duration-500 group h-full">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-nebula-violet/20 to-nebula-cyan/20 flex items-center justify-center text-nebula-violet mb-5 group-hover:scale-110 transition-transform duration-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <h4 class="font-semibold mb-2.5 text-white">Pemahaman Bisnis</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Pernah bekerja di lapangan &mdash; sales engineering, audit sistem, stok &amp; distribusi. Saya paham pain point yang sering diabaikan developer.</p>
+    </div>
+    <div class="reveal glass rounded-2xl p-7 transition-all duration-500 group h-full">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-nebula-violet/20 to-nebula-cyan/20 flex items-center justify-center text-nebula-magenta mb-5 group-hover:scale-110 transition-transform duration-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <h4 class="font-semibold mb-2.5 text-white">Desain Unik</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Tidak monoton. Setiap proyek punya karakter sendiri &mdash; tema galaksi, tipografi serif modern, micro-interaction yang sopan.</p>
+    </div>
+    <div class="reveal glass rounded-2xl p-7 transition-all duration-500 group h-full">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-nebula-violet/20 to-nebula-cyan/20 flex items-center justify-center text-nebula-blue mb-5 group-hover:scale-110 transition-transform duration-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h4 class="font-semibold mb-2.5 text-white">Aman &amp; Terstruktur</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Kode bersih, accessible, SEO-friendly. Admin panel dengan dashboard yang logis, bukan hanya tabel yang berantakan.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="relative z-10 px-8 py-24 max-w-7xl mx-auto">
+  <div class="mb-14">
+    <p class="text-nebula-violet text-xs tracking-[.3em] uppercase mb-3 font-mono">02 / Keahlian</p>
+    <h3 class="reveal font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] mb-3 text-white">Stack untuk hasil nyata</h3>
+    <p class="reveal text-slate-400 text-sm">Teknologi yang saya pakai sehari-hari</p>
+  </div>
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="reveal glass rounded-2xl p-7 group">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-nebula-cyan/10 flex items-center justify-center text-nebula-cyan">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h4 class="font-semibold text-white text-sm">Frontend</h4>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed mb-4">HTML, CSS, Vanilla JS &mdash; tanpa boilerplate berlebihan, performa tetap prima.</p>
+      <div class="h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[90%] bg-gradient-to-r from-nebula-cyan to-nebula-violet rounded-full"></div></div>
+    </div>
+    <div class="reveal glass rounded-2xl p-7 group">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-nebula-violet/10 flex items-center justify-center text-nebula-violet">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h4 class="font-semibold text-white text-sm">Backend</h4>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed mb-4">PHP/Laravel, Node.js &mdash; REST API, autentikasi, CRUD solid.</p>
+      <div class="h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[85%] bg-gradient-to-r from-nebula-violet to-nebula-magenta rounded-full"></div></div>
+    </div>
+    <div class="reveal glass rounded-2xl p-7 group">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-nebula-magenta/10 flex items-center justify-center text-nebula-magenta">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h4 class="font-semibold text-white text-sm">Database</h4>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed mb-4">MySQL, PostgreSQL, Supabase &mdash; desain relasional yang efisien.</p>
+      <div class="h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[80%] bg-gradient-to-r from-nebula-magenta to-nebula-violet rounded-full"></div></div>
+    </div>
+    <div class="reveal glass rounded-2xl p-7 group">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-nebula-blue/10 flex items-center justify-center text-nebula-blue">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h4 class="font-semibold text-white text-sm">Aplikasi Bisnis</h4>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed mb-4">Admin panel, dashboard stok, POS, monitoring, audit SI (COBIT).</p>
+      <div class="h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[88%] bg-gradient-to-r from-nebula-blue to-nebula-cyan rounded-full"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="proses" class="relative z-10 px-8 py-24 max-w-7xl mx-auto">
+  <div class="mb-14">
+    <p class="text-nebula-magenta text-xs tracking-[.3em] uppercase mb-3 font-mono">03 / Proses</p>
+    <h3 class="reveal font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] mb-3 text-white">Dari diskusi sampai live</h3>
+    <p class="reveal text-slate-400 text-sm">Alur kerja yang jelas di setiap tahap</p>
+  </div>
+  <div class="grid md:grid-cols-4 gap-6 reveal">
+    <div class="glass rounded-2xl p-7 text-center relative group hover:-translate-y-1 transition-all duration-500">
+      <div class="font-mono text-5xl font-bold gradient-text mb-4">01</div>
+      <h4 class="font-semibold text-sm mb-2.5 text-white">Diskusi</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Pahami masalah bisnis, target user, dan scope yang realistis.</p>
+      <div class="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 text-nebula-violet/40 text-xl">&rarr;</div>
+    </div>
+    <div class="glass rounded-2xl p-7 text-center relative group hover:-translate-y-1 transition-all duration-500">
+      <div class="font-mono text-5xl font-bold gradient-text mb-4">02</div>
+      <h4 class="font-semibold text-sm mb-2.5 text-white">Desain</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Wireframe dan visual yang sesuai brand &mdash; bukan template asal.</p>
+      <div class="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 text-nebula-violet/40 text-xl">&rarr;</div>
+    </div>
+    <div class="glass rounded-2xl p-7 text-center relative group hover:-translate-y-1 transition-all duration-500">
+      <div class="font-mono text-5xl font-bold gradient-text mb-4">03</div>
+      <h4 class="font-semibold text-sm mb-2.5 text-white">Development</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Coding bersih, tanpa dependency tak perlu, performa diperhatikan.</p>
+      <div class="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 text-nebula-violet/40 text-xl">&rarr;</div>
+    </div>
+    <div class="glass rounded-2xl p-7 text-center group hover:-translate-y-1 transition-all duration-500">
+      <div class="font-mono text-5xl font-bold gradient-text mb-4">04</div>
+      <h4 class="font-semibold text-sm mb-2.5 text-white">Deploy</h4>
+      <p class="text-xs text-slate-400 leading-relaxed">Testing, deployment, dan dokumentasi &mdash; siap pakai dan mudah dirawat.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="relative z-10 px-8 py-24 max-w-7xl mx-auto">
+  <div class="mb-14">
+    <p class="text-nebula-cyan text-xs tracking-[.3em] uppercase mb-3 font-mono">04 / Proyek</p>
+    <h3 class="reveal font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] mb-3 text-white">Yang pernah dibangun</h3>
+    <p class="reveal text-slate-400 text-sm">Beberapa contoh karya nyata</p>
+  </div>
+  <div class="space-y-5">
+    <a href="https://siberinfo.id" target="_blank" rel="noopener" class="reveal glass rounded-2xl p-8 hover:shadow-[0_0_40px_rgba(34,211,238,.25)] hover:-translate-y-1 transition-all duration-500 grid grid-cols-[70px_1fr] gap-6 no-underline text-inherit group">
+      <div class="font-mono text-4xl font-bold gradient-text leading-none">01</div>
+      <div>
+        <h4 class="font-semibold mb-2.5 text-white text-lg flex items-center gap-3 flex-wrap">Siberinfo &mdash; Portal Internal
+          <span class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-nebula-cyan/10 border border-nebula-cyan/30 text-nebula-cyan font-normal">
+            <span class="w-1.5 h-1.5 rounded-full bg-nebula-cyan pulse"></span>Live Demo
+          </span>
+        </h4>
+        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Sistem informasi internal perusahaan dengan manajemen asset, ticketing, dan laporan real-time. Sudah beroperasi dan dipakai sehari-hari.</p>
+        <div class="flex gap-2 flex-wrap">
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">Laravel</span>
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">Supabase</span>
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">jQuery</span>
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">REST API</span>
+        </div>
+      </div>
+    </a>
+    <a href="https://taubatanmanu-pixel.github.io/idcabekasi/" target="_blank" rel="noopener" class="reveal glass rounded-2xl p-8 hover:shadow-[0_0_40px_rgba(168,85,247,.25)] hover:-translate-y-1 transition-all duration-500 grid grid-cols-[70px_1fr] gap-6 no-underline text-inherit">
+      <div class="font-mono text-4xl font-bold gradient-text leading-none">02</div>
+      <div>
+        <h4 class="font-semibold mb-2.5 text-white text-lg flex items-center gap-3 flex-wrap">IDCA Kota Bekasi
+          <span class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-nebula-violet/10 border border-nebula-violet/30 text-nebula-violet font-normal">
+            <span class="w-1.5 h-1.5 rounded-full bg-nebula-violet pulse"></span>Live
+          </span>
+        </h4>
+        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Website profil komunitas Indonesia Drum Corps Association Kota Bekasi. Berisi beranda, profil unit, agenda kegiatan, prestasi, galeri foto dengan lightbox, galeri video, mitra, struktur organisasi, dan FAQ.</p>
+        <div class="flex gap-2 flex-wrap">
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">HTML</span>
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">CSS</span>
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">Vanilla JS</span>
+          <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">Lightbox</span>
+        </div>
+      </div>
+    </a>
+    <a href="https://taubatanmanu-pixel.github.io/Warehouse/" target="_blank" rel="noopener" class="reveal glass rounded-2xl p-8 hover:shadow-[0_0_40px_rgba(168,85,247,.25)] hover:-translate-y-1 transition-all duration-500 grid grid-cols-[70px_1fr] gap-6 no-underline text-inherit">
+      <div class="font-mono text-4xl font-bold gradient-text leading-none">03</div>
+      <div>
+        <h4 class="font-semibold mb-2.5 text-white text-lg flex items-center gap-3 flex-wrap">Warehouse — Manajemen Gudang
+          <span class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-nebula-magenta/10 border border-nebula-magenta/30 text-nebula-magenta font-normal">
+            <span class="w-1.5 h-1.5 rounded-full bg-nebula-magenta pulse"></span>Live
+          </span>
+        </h4>
+        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Sistem manajemen gudang dengan pencatatan barang masuk/keluar, stock opname, mutasi antar lokasi, dan validasi stok tidak minus. Dashboard analitik dengan Chart.js, multi-PT filtering, export Excel/PDF. Skema relasional, antarmuka SPA tanpa reload.</p>
+        <div class="flex gap-2 flex-wrap">
+                  <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">HTML</span>
+                  <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">CSS</span>
+                  <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">Vanilla JS</span>
+                  <span class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">Chart.js</span>
+                </div>
+      </div>
+    </a>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testi" class="relative z-10 px-8 py-24 max-w-7xl mx-auto">
+  <div class="mb-14">
+    <p class="text-nebula-violet text-xs tracking-[.3em] uppercase mb-3 font-mono">05 / Testimoni</p>
+    <h3 class="reveal font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] mb-3 text-white">Kata mereka</h3>
+    <p class="reveal text-slate-400 text-sm">Yang sudah bekerja sama</p>
+  </div>
+  <div class="grid md:grid-cols-1 gap-6 justify-center">
+    <div class="reveal glass rounded-2xl p-8 relative hover:-translate-y-1 transition-all duration-500 max-w-2xl mx-auto">
+      <div class="font-serif text-6xl gradient-text opacity-40 absolute top-4 left-6 leading-none">&ldquo;</div>
+      <div class="flex gap-1 mb-4 pt-8">
+        <svg class="w-4 h-4 text-nebula-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="w-4 h-4 text-nebula-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="w-4 h-4 text-nebula-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="w-4 h-4 text-nebula-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="w-4 h-4 text-nebula-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <blockquote class="text-sm text-slate-300 italic leading-relaxed mb-6">web berjalan dengan lancar dan kalau minta revisi bisa sangat cepat di selesaikan</blockquote>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-nebula-cyan to-nebula-violet flex items-center justify-center text-white font-bold text-sm">S</div>
+        <div>
+          <div class="text-xs text-white font-semibold">Owner</div>
+          <div class="text-xs text-slate-500">Siberinfo, Bekasi</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT / FOOTER -->
+<footer id="contact" class="relative z-10 px-8 py-24 text-center">
+  <div class="max-w-2xl mx-auto">
+    <p class="text-nebula-cyan text-xs tracking-[.3em] uppercase mb-4 font-mono">06 / Kontak</p>
+    <h3 class="reveal font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] mb-4 text-white">Mari bekerja sama</h3>
+    <p class="reveal text-slate-400 text-sm mb-8">Punya proyek? Diskusikan tanpa biaya konsultasi.</p>
+    <a href="mailto:taubatanmanu@gmail.com" class="reveal inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-nebula-violet to-nebula-cyan text-white text-sm font-semibold hover:shadow-[0_0_40px_rgba(168,85,247,.6)] transition-all duration-300">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      taubatanmanu@gmail.com
+    </a>
+    <div class="reveal mt-12 pt-8 border-t border-white/5 text-xs text-slate-500">
+      &copy; 2026 MANU &mdash; Dibuat tanpa framework yang tak perlu.
+    </div>
+  </div>
+</footer>
+
+<script>
+// Splash
+setTimeout(() => { const s = document.getElementById("splash"); s.style.opacity = "0"; s.style.pointerEvents = "none"; setTimeout(() => s.remove(), 700); }, 1600);
+
+// Scroll reveal
+const io = new IntersectionObserver(e => e.forEach(v => { if (v.isIntersecting) v.target.classList.add("visible"); }), { threshold: 0.12 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+// Typewriter
+const phrases = ["Portal Internal \u2192","Dashboard Stok \u2192","Audit Sistem \u2192","Web App Bisnis \u2192"];
+let pi = 0, ci = 0, del = false;
+const tw = document.getElementById("typewriter");
+(function type() {
+  const w = phrases[pi];
+  if (!del) tw.textContent = w.slice(0, ++ci); else tw.textContent = w.slice(0, --ci);
+  let sp = del ? 40 : 90;
+  if (!del && ci === w.length) { sp = 1800; del = true; }
+  else if (del && ci === 0) { del = false; pi = (pi + 1) % phrases.length; sp = 300; }
+  setTimeout(type, sp);
+})();
+
+// Theme: Alpine x-data sudah handle init dari localStorage.
+// Terapkan class awal sebelum Alpine hydrate agar tidak flash.
+if (localStorage.getItem("theme") === "light") { document.documentElement.classList.add("light"); }
+
+// Parallax starfield on scroll
+let ticking = false;
+window.addEventListener("scroll", () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      const y = window.scrollY;
+      document.getElementById("stars2").style.transform = "translateY(" + (y * 0.05) + "px)";
+      document.getElementById("stars3").style.transform = "translateY(" + (y * 0.1) + "px)";
+      ticking = false;
+    });
+    ticking = true;
+  }
+});
+</script>
+</body>
+</html>

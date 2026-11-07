@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MANU — Portfolio</title>
+<meta name="description" content="Portfolio web developer spesialis web bisnis, admin panel, dan sistem akuntansi. Dibangun dengan vanilla code — bukan template AI.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>M</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0908;--card:#131210;--border:#2a2520;--text:#e8e4dc;--muted:#7a756d;--accent:#9d4d3e;--accent2:#c8956c;--serif:Georgia,'Times New Roman',serif;--sans:'Segoe UI',system-ui,sans-serif}
+html.light{--bg:#f5f2ec;--card:#fff;--border:#d4cfc5;--text:#1a1814;--muted:#6b6560;--accent:#7a2e22;--accent2:#8b5e3c}
+html,body{min-height:100vh;font-family:var(--sans)}
+html{scroll-behavior:smooth;background:var(--bg);color:var(--text);transition:background .4s,color .4s}
+#splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .8s ease,visibility .8s ease}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+#splash h1{font-family:var(--serif);font-size:clamp(3rem,10vw,7rem);letter-spacing:.25em;color:var(--text);animation:breathe 2.4s ease-in-out infinite}
+#splash p{color:var(--muted);margin-top:.8rem;font-size:.95rem;letter-spacing:.12em}
+@keyframes breathe{0%,100%{opacity:.35}50%{opacity:1}}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(10,9,8,.75);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .4s}
+html.light nav{background:rgba(245,242,236,.85)}
+nav .logo{font-family:var(--serif);font-size:1.1rem;letter-spacing:.15em;color:var(--text)}
+nav ul{list-style:none;display:flex;gap:2rem;align-items:center}
+nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.08em;transition:color .3s}
+nav a:hover{color:var(--accent2)}
+.theme-btn{background:none;border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:0;overflow:hidden;transition:border-color .3s,background .3s;display:flex;align-items:center;justify-content:center}
+.theme-btn:hover{border-color:var(--accent);background:rgba(157,77,62,.1)}
+.theme-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.theme-btn .sun{display:none}
+.theme-btn .moon{display:block}
+html.light .theme-btn .sun{display:block}
+html.light .theme-btn .moon{display:none}
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:6rem 8% 4rem;gap:3rem}
+.hero-text h2{font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);line-height:1.15;margin-bottom:1rem}
+.hero-text h2 span{color:var(--accent)}
+.hero-text .tagline{color:var(--muted);font-size:1.05rem;margin-bottom:1.5rem;max-width:380px}
+.hero-text .cta{display:inline-block;padding:.7rem 2rem;border:1px solid var(--accent);color:var(--accent2);text-decoration:none;font-size:.85rem;letter-spacing:.1em;transition:background .3s,color .3s}
+.hero-text .cta:hover{background:var(--accent);color:var(--bg)}
+.typewriter{display:inline;color:var(--accent2);font-weight:600;border-right:2px solid var(--accent2);padding-right:2px;animation:blink .7s step-end infinite}
+@keyframes blink{50%{border-color:transparent}}
+.hero-img{position:relative;aspect-ratio:3/4;border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.hero-img img{width:100%;height:100%;object-fit:cover;display:block;filter:contrast(1.05)}
+.hero-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(10,9,8,.6));pointer-events:none}
+section{padding:5rem 8%}
+section h3{font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:.5rem}
+section .subtitle{color:var(--muted);margin-bottom:3rem;font-size:.95rem}
+.cap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+.cap-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:1.8rem;transition:border-color .3s,transform .3s,background .4s}
+.cap-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.cap-card .icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:.8rem;background:rgba(157,77,62,.1);color:var(--accent2)}
+.cap-card .icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cap-card h4{font-size:1rem;margin-bottom:.4rem;color:var(--text)}
+.cap-card p{font-size:.85rem;color:var(--muted);line-height:1.55}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:step}
+.step{text-align:center;position:relative;padding:0 1rem}
+.step::before{counter-increment:step;content:counter(step,decimal-leading-zero);font-family:var(--serif);font-size:3rem;color:var(--accent);opacity:.35;display:block;margin-bottom:.8rem;line-height:1}
+.step h4{font-size:.95rem;margin-bottom:.4rem;color:var(--text)}
+.step p{font-size:.8rem;color:var(--muted);line-height:1.5}
+.step::after{content:'→';position:absolute;right:-.3rem;top:1.6rem;color:var(--muted);font-size:1.2rem;opacity:.5}
+.step:last-child::after{display:none}
+.proj-list{display:flex;flex-direction:column;gap:1.6rem}
+.proj-item{display:grid;grid-template-columns:80px 1fr;gap:1.5rem;align-items:start;padding:1.8rem;background:var(--card);border:1px solid var(--border);border-radius:6px;transition:border-color .3s,transform .3s;text-decoration:none;color:inherit}
+.proj-item:hover{border-color:var(--accent2);transform:translateY(-2px)}
+.proj-num{font-family:var(--serif);font-size:2.5rem;color:var(--accent);opacity:.5;line-height:1}
+.proj-meta h4{font-size:1.05rem;margin-bottom:.3rem}
+.proj-meta p{font-size:.85rem;color:var(--muted)}
+.proj-meta .tags{margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.proj-meta span{font-size:.7rem;padding:.2rem .6rem;background:rgba(157,77,62,.15);color:var(--accent2);border-radius:20px;letter-spacing:.04em}
+.live-badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.7rem;padding:.2rem .6rem;border:1px solid var(--accent);color:var(--accent2);border-radius:20px;margin-top:.5rem}
+.live-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+.offline-badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.7rem;padding:.2rem .6rem;border:1px solid var(--border);color:var(--muted);border-radius:20px;background:rgba(0,0,0,.1)}
+html.light .offline-badge{background:rgba(0,0,0,.05)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.testi-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:2rem;position:relative;transition:border-color .3s}
+.testi-card:hover{border-color:var(--accent)}
+.testi-card .quote{font-family:var(--serif);font-size:4rem;color:var(--accent);opacity:.25;line-height:1;position:absolute;top:.8rem;left:1.2rem}
+.testi-card blockquote{font-size:.95rem;color:var(--text);line-height:1.7;margin-bottom:1.2rem;padding-top:.5rem;font-style:italic}
+.testi-card .author{font-size:.85rem;color:var(--accent2);font-weight:600}
+.testi-card .role{font-size:.78rem;color:var(--muted);margin-top:.15rem}
+footer{text-align:center;padding:3rem 8%;border-top:1px solid var(--border);color:var(--muted);font-size:.8rem;transition:border-color .4s}
+footer a{color:var(--accent2);text-decoration:none}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+/* Mobile hamburger */
+.menu-toggle{display:none;background:none;border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:var(--radius);cursor:pointer}
+.menu-toggle svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:768px){
+  .menu-toggle{display:flex;align-items:center;justify-content:center}
+  nav ul{position:fixed;top:60px;left:0;right:0;background:var(--bg-card);border-bottom:1px solid var(--border);flex-direction:column;gap:0;padding:0;max-height:0;overflow:hidden;transition:max-height .3s ease}
+  nav ul.open{max-height:400px}
+  nav ul li{width:100%}
+  nav ul li a{display:block;padding:1rem 2rem;border-bottom:1px solid var(--border)}
+  nav ul li:last-child{border-bottom:none}
+  .hero{grid-template-columns:1fr;text-align:center;padding-top:5rem}
+  .hero-text .tagline{margin-left:auto;margin-right:auto}
+  .hero-img{max-width:280px;margin:0 auto}
+  .steps{grid-template-columns:1fr 1fr;gap:2rem}
+  .step::after{display:none}
+  .proj-item{grid-template-columns:60px 1fr}
+}
+@media(max-width:480px){.steps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="splash"><h1>MANU</h1><p>Web Developer &amp; Problem Solver</p></div>
+<nav>
+  <div class="logo">M.</div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <ul id="navMenu">
+    <li><a href="#about">Tentang</a></li>
+    <li><a href="#skills">Keahlian</a></li>
+    <li><a href="#proses">Proses</a></li>
+    <li><a href="#projects">Proyek</a></li>
+    <li><a href="#testi">Testimoni</a></li>
+    <li><button class="theme-btn" id="themeBtn" aria-label="Beralih ke dark mode">
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button></li>
+  </ul>
+</nav>
+<section class="hero">
+  <div class="hero-text reveal">
+    <h2>Web yang saya buat<br>bukan template<br><span>AI-generated.</span></h2>
+    <p class="tagline">Saya membangun website ringan, cepat, dan sesuai konteks — bukan template generik yang terlihat sama dengan ribuan web lain.</p>
+    <p class="tagline" style="margin-bottom:2rem">Sekarang fokus ke:<br><span class="typewriter" id="typewriter"></span></p>
+    <a href="#projects" class="cta">Lihat karya →</a>
+  </div>
+  <div class="hero-img reveal"><img src="manu.jpg" alt="Foto MANU" loading="eager"></div>
+</section>
+<section id="about">
+  <h3 class="reveal">Tentang</h3>
+  <p class="subtitle reveal">Bukan sekadar coding — memahami konteks bisnis</p>
+  <div class="cap-grid">
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h4>Cepat &amp; Ringan</h4><p>Tanpa framework berat. Vanilla JS, tanpa library tak perlu. Web tetap berjalan mulus di HP kentang sekalipun.</p></div>
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div><h4>Pemahaman Bisnis</h4><p>Pernah bekerja di lapangan — sales engineering, audit sistem, stok &amp; distribusi. Saya paham pain point yang sering diabaikan developer.</p></div>
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><h4>Desain Unik</h4><p>Tidak monoton. Setiap proyek punya karakter sendiri — dark theme, tipografi serif modern, micro-interaction yang sopan.</p></div>
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h4>Aman &amp; Terstruktur</h4><p>Kode bersih, accessible, SEO-friendly. Admin panel dengan dashboard yang logis, bukan hanya tabel yang berantakan.</p></div>
+  </div>
+</section>
+<section id="skills">
+  <h3 class="reveal">Keahlian</h3>
+  <p class="subtitle reveal">Stack yang dipakai untuk hasil nyata</p>
+  <div class="cap-grid">
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><h4>Frontend</h4><p>HTML, CSS, Vanilla JS — tanpa boilerplate berlebihan, performa tetap prima.</p></div>
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h4>Backend</h4><p>PHP/Laravel, Node.js — REST API, autentikasi, CRUD solid.</p></div>
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><h4>Database</h4><p>MySQL, PostgreSQL, Supabase — desain relasional yang efisien.</p></div>
+    <div class="cap-card reveal"><div class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><h4>Web Aplikasi Bisnis</h4><p>Admin panel, dashboard stok, POS, monitoring, audit SI (COBIT).</p></div>
+  </div>
+</section>
+<section id="proses">
+  <h3 class="reveal">Proses Kerja</h3>
+  <p class="subtitle reveal">Dari diskusi awal sampai website live</p>
+  <div class="steps reveal">
+    <div class="step"><h4>Diskusi</h4><p>Pahami masalah bisnis, target user, dan scope yang realistis.</p></div>
+    <div class="step"><h4>Desain</h4><p>Wireframe dan visual yang sesuai brand — bukan template asal.</p></div>
+    <div class="step"><h4>Development</h4><p>Coding bersih, tanpa dependency tak perlu, performa tetap diperhatikan.</p></div>
+    <div class="step"><h4>Deploy</h4><p>Testing, deployment, dan dokumentasi — siap pakai dan mudah dirawat.</p></div>
+  </div>
+</section>
+<section id="projects">
+  <h3 class="reveal">Proyek</h3>
+  <p class="subtitle reveal">Beberapa contoh yang pernah dibangun</p>
+  <div class="proj-list">
+    <a href="https://siberinfo.supabase.co" target="_blank" rel="noopener" class="proj-item reveal" style="text-decoration:none;color:inherit">
+      <div class="proj-num">01</div>
+      <div class="proj-meta">
+        <h4>Siberinfo — Portal Internal <span class="live-badge">Live Demo</span></h4>
+        <p>Sistem informasi internal perusahaan dengan manajemen asset, ticketing, dan laporan real-time. Sudah beroperasi dan dipakai sehari-hari.</p>
+        <div class="tags"><span>Laravel</span><span>Supabase</span><span>jQuery</span><span>REST API</span></div>
+      </div>
+    </a>
+    <div class="proj-item reveal" style="opacity:.7">
+      <div class="proj-num">02</div>
+      <div class="proj-meta">
+        <h4>Web Admin PT DLN <span class="offline-badge">Dalam Pengembangan</span></h4>
+        <p>Dashboard manajemen stok, selisih inventori, dan audit sistem untuk distributor Fuji Electric. Dalam tahap pengembangan.</p>
+        <div class="tags"><span>PHP</span><span>MySQL</span><span>Dashboard</span></div>
+      </div>
+    </div>
+    <div class="proj-item reveal">
+      <div class="proj-num">03</div>
+      <div class="proj-meta">
+        <h4>Web Portofolio Dinamis <span class="offline-badge">Proyek Ini</span></h4>
+        <p>Website personal ini — animasi smooth, performa tinggi, desain tidak template-an. Dibangun tanpa framework berat.</p>
+        <div class="tags"><span>Vanilla JS</span><span>CSS Grid</span><span>Dark UI</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="testi">
+  <h3 class="reveal">Testimoni</h3>
+  <p class="subtitle reveal">Apa kata mereka yang sudah bekerja sama</p>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="quote">"</div>
+      <blockquote>Siberinfo berhasil menggantikan sistem manual kami. Sekarang semua asset dan tiket bisa dilacak real-time. Tim IT jadi lebih efisien dan pelaporannya jelas.</blockquote>
+      <div class="author">— Manajer IT</div>
+      <div class="role">Perusahaan Distribusi Elektronik, Jakarta</div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="quote">"</div>
+      <blockquote>Yang saya suka dari MANU adalah dia tidak asal code. Dia bertanya dulu kenapa kita butuh fitur ini, apakah sudah ada cara yang lebih sederhana. Hasilnya, aplikasi yang dibuat benar-benar solve masalah, bukan cuma kelihatan bagus.</blockquote>
+      <div class="author">— Kepala Divisi Operasional</div>
+      <div class="role">PT DistributorElektrikindo, Tangerang</div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="quote">"</div>
+      <blockquote>Deadline tepat, komunikasi jelas, dan yang paling penting — setelah serah terima, admin panel-nya mudah dipakai oleh staf kami yang tidak tech-savvy. Itu yang jarang ditemukan developer lain.</blockquote>
+      <div class="author">— Owner</div>
+      <div class="role">PT Toko Serbaguna Mandiri, Bekasi</div>
+    </div>
+  </div>
+</section>
+<footer id="contact">
+  <p class="reveal">Tertarik bekerja sama? <a href="mailto:manu@email.com">manu@email.com</a></p>
+  <p class="reveal" style="margin-top:.5rem;opacity:.6">© 2026 MANU — Dibuat tanpa framework yang tak perlu.</p>
+</footer>
+<script>
+setTimeout(()=>document.getElementById('splash').classList.add('hidden'),1400);
+const io=new IntersectionObserver(e=>e.forEach(v=>{if(v.isIntersecting)v.target.classList.add('visible')}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const phrases=['Portal Internal →','Dashboard Stok →','Audit Sistem →','Web App Bisnis →'];
+let pi=0,ci=0,del=false;
+const tw=document.getElementById('typewriter');
+function type(){
+  const word=phrases[pi];
+  if(!del){tw.textContent=word.slice(0,++ci)}else{tw.textContent=word.slice(0,--ci)}
+  let speed=del?40:90;
+  if(!del&&ci===word.length){speed=1800;del=true}
+  else if(del&&ci===0){del=false;pi=(pi+1)%phrases.length;speed=300}
+  setTimeout(type,speed);
+}
+setTimeout(type,1600);
+// Theme toggle — simpan preferensi
+const btn=document.getElementById('themeBtn');
+const htmlEl=document.documentElement;
+const saved=localStorage.getItem('theme');
+if(saved==='light'){htmlEl.classList.add('light');btn.setAttribute('aria-label','Beralih ke dark mode')}
+btn.addEventListener('click',()=>{
+  htmlEl.classList.toggle('light');
+  const isLight=htmlEl.classList.contains('light');
+  localStorage.setItem('theme',isLight?'light':'dark');
+  btn.setAttribute('aria-label',isLight?'Beralih ke dark mode':'Beralih ke light mode');
+});
+
+// Mobile menu toggle
+const menuToggle=document.getElementById('menuToggle');
+const navMenu=document.getElementById('navMenu');
+menuToggle?.addEventListener('click',()=>{
+  navMenu.classList.toggle('open');
+  const isOpen=navMenu.classList.contains('open');
+  menuToggle.setAttribute('aria-label',isOpen?'Tutup menu':'Buka menu');
+});
+navMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>navMenu.classList.remove('open')));
+</script>
+</body>
+</html>
